@@ -58,7 +58,7 @@ For ($serie; 1; $nbLoops)
 	DOM SET XML ATTRIBUTE:C866($tempText; "style"; $fontStyle)
 	$temPict:=SVG_Export_to_picture($tempSvg; Get XML data source:K45:16)
 	PICTURE PROPERTIES:C457($temPict; $tempLabelsWidth; $tempLabelsHeight)
-	
+
 	If ($tempLabelsWidth>$LabelsFontWidth)
 		$LabelsFontWidth:=$tempLabelsWidth
 	End if 
