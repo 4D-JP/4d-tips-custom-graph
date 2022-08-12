@@ -1,0 +1,157 @@
+﻿<!--#4DCODE
+
+$svg:="<g style='clip-path: url(#ID_backgroundClipPath)'>"
+
+$total:=0
+$pi:=Pi:K30:1
+
+$centerX:=($graphX1+$graphX2)/2
+$centerY:=($graphY1+$graphY2)/2
+$radiusX:=($graphX2-$graphX1)/2-(2*20)
+$radiusY:=($graphY2-$graphY1)/2-(2*20)
+
+If ($pieDirection=1)
+	$startAngle:=$startAngle-90  // for internal calculation, do NOT change this line
+Else 
+	$startAngle:=$startAngle+90  // for internal calculation, do NOT change this line
+End if 
+
+If ($radiusX<$radiusY)
+	$radius:=$radiusX
+Else 
+	$radius:=$radiusY
+End if 
+
+ARRAY REAL:C219($_anglesDeg;$NbValues)
+ARRAY REAL:C219($_anglesRad;$NbValues)
+ARRAY TEXT:C222($_textPercentage;$NbValues)
+ARRAY REAL:C219($_PieValues;$NbValues)
+COPY ARRAY:C226($yValuesArrPtr{1}->;$_PieValues)
+
+For ($value;1;$NbValues)
+	$_PieValues{$value}:=Abs:C99($_PieValues{$value})
+End for 
+$total:=Sum:C1($_PieValues)
+
+For ($value;1;$NbValues)
+	$_anglesDeg{$value}:=360*$_PieValues{$value}/$total
+	$_anglesRad{$value}:=$_anglesDeg{$value}*2*$pi/360
+	$_textPercentage{$value}:=String:C10(Round:C94(100*$_PieValues{$value}/$total;2))+" %"
+End for 
+
+For ($i;1;3)  //First for SHADOWS, second for COLOURED bars, third labels %
+	
+	$SumAngle:=$startAngle
+	For ($value;1;$NbValues)
+		
+		Case of 
+			: ($i=1)
+				$svg:=$svg+"<g fill='black' fill-opacity='0.2' id='ID_graph_shadow_"+String:C10($value)+"'>"
+			: ($i=2)
+				$svg:=$svg+"<g fill='"+$barColors{$value}+"' filter='none' id='ID_graph_"+String:C10($value)+"' opacity='1' stroke='none' stroke-opacity='1' stroke-width='0'>"
+			: ($i=3)
+				$svg:=$svg+"<g fill='"+$barColors{$value}+"' filter='none' id='ID_pie_label_"+String:C10($value)+"' opacity='1' stroke='none' stroke-opacity='1' stroke-width='0'>"
+		End case 
+		
+		  //***
+		If ($pieDirection=1)
+			$rotateAngle:=$SumAngle
+			$translateAngleRad:=($rotateAngle+($_anglesDeg{$value}/2))*2*$pi/360
+		Else 
+			$rotateAngle:=$SumAngle*(-1)
+			$translateAngleRad:=($rotateAngle-($_anglesDeg{$value}/2))*2*$pi/360
+		End if 
+		  //***
+		
+		If ($i<3)
+			
+			$path:=""
+			$path:=$path+"M"+String:C10($centerX;"&xml")+","+String:C10($centerY;"&xml")+" l"+String:C10($radius;"&xml")+",0 "
+			$path:=$path+"A"+String:C10($radius;"&xml")+","+String:C10($radius;"&xml")+" 0 "
+			
+			If ($_anglesDeg{$value}#360)
+				If ($_anglesDeg{$value}<180)
+					$path:=$path+"0,0 "
+				Else 
+					$path:=$path+"1,0 "
+				End if 
+			Else 
+				  //$path:=$path+"1,1 "
+			End if 
+			
+			$path:=$path+String:C10(Round:C94($centerX+($radius*Cos:C18($_anglesRad{$value}));2);"&xml")+","
+			$path:=$path+String:C10(Round:C94($centerY-($radius*Sin:C17($_anglesRad{$value}));2);"&xml")+" z"
+			
+			
+			If ($pieDirection=1)
+				$rotateAngle:=$SumAngle+$_anglesDeg{$value}
+			Else 
+				$rotateAngle:=$SumAngle*(-1)
+			End if 
+			
+			  //***
+			$rotatePie:="rotate("+String:C10(Round:C94($rotateAngle;2);"&xml")+","+String:C10($centerX;"&xml")+","+String:C10($centerY;"&xml")+")"
+			  //***
+			
+			$translatePieX:=$pieShift*Cos:C18($translateAngleRad)
+			If $i=1
+				$translatePieX:=$translatePieX+$BarShadowX
+			End if 
+			$translatePieY:=$pieShift*Sin:C17($translateAngleRad)
+			If $i=1
+				$translatePieY:=$translatePieY+$BarShadowX
+			End if 
+			$translatePie:="translate("+String:C10(Round:C94($translatePieX;2);"&xml")+","
+			$translatePie:=$translatePie+String:C10(Round:C94($translatePieY;2);"&xml")+")"
+			
+			$svg:=$svg+"<g transform='"+$translatePie+" "+$rotatePie+"'>"
+			
+			If ($_anglesDeg{$value}=360)
+				If ($i=1)
+					$svg:=$svg+"<circle cx='"+String:C10($centerX;"&xml")+"' cy='"+String:C10($centerY;"&xml")+"' r='"+String:C10($radius;"&xml")+"'/>"
+				Else 
+					$svg:=$svg+"<circle cx='"+String:C10($centerX;"&xml")+"' cy='"+String:C10($centerY;"&xml")+"' r='"+String:C10($radius;"&xml")+"'/>"
+					$svg:=$svg+"<circle cx='"+String:C10($centerX;"&xml")+"' cy='"+String:C10($centerY;"&xml")+"' r='"+String:C10($radius;"&xml")+"' fill='url(#WhiteBlackGradient)'/>"
+					$svg:=$svg+"<circle cx='"+String:C10($centerX;"&xml")+"' cy='"+String:C10($centerY;"&xml")+"' r='"+String:C10($radius;"&xml")+"' fill-opacity='0.3' filter='url(#SaturateMinus)'/>"
+				End if 
+			Else 
+				If ($i=1)
+					$svg:=$svg+"<path d='"+$path+"'/>"
+				Else 
+					$svg:=$svg+"<path d='"+$path+"'/>"
+					$svg:=$svg+"<path d='"+$path+"' fill='url(#WhiteBlackGradient)'/>"
+					$svg:=$svg+"<path d='"+$path+"' fill-opacity='0.3' filter='url(#SaturateMinus)'/>"
+				End if 
+			End if 
+			
+			$svg:=$svg+"</g>"
+			
+		Else 
+			
+			$translateTextX:=50+(($pieShift+(7/10*$radius))*Cos:C18($translateAngleRad))
+			$translateTextY:=20+(($pieShift+(7/10*$radius))*Sin:C17($translateAngleRad))
+			$translateText:="translate("+String:C10(Round:C94($translateTextX;2);"&xml")+","
+			$translateText:=$translateText+String:C10(Round:C94($translateTextY;2);"&xml")+")"
+			
+			$svg:=$svg+"<g transform='"+$translateText+"' font-size='"+String:C10($pieFontSize;"&xml")+"'>"
+			$svg:=$svg+"<text fill='grey' text-anchor='middle' font-weight='bold' x='"+String:C10($centerX-49;"&xml")+"' y='"+String:C10($centerY-($pieFontSize/2)-1;"&xml")+"'>"+$_textPercentage{$value}+"</text>"
+			$svg:=$svg+"<text fill='white' text-anchor='middle' font-weight='bold' x='"+String:C10($centerX-50;"&xml")+"' y='"+String:C10($centerY-($pieFontSize/2)-2;"&xml")+"'>"+$_textPercentage{$value}+"</text>"
+			
+			$svg:=$svg+"</g>"
+			
+		End if 
+		$svg:=$svg+"</g>"
+		
+		$SumAngle:=$SumAngle+$_anglesDeg{$value}
+	End for 
+End for 
+
+$svg:=$svg+"</g>"  // END CLIPPATH
+$svg:=Replace string:C233($svg;"4DEVAL";"xxxx")
+
+-->
+
+<!--4DHTML $svg-->
+	
+</g>
+</svg>
