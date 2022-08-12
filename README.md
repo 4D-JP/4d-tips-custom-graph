@@ -69,3 +69,7 @@ $LegendHeight:=($nbLoops*$LegendBulletHeight)+(($nbLoops+1)*$LegendBulletGap)
 
 End if 
 ```
+
+#### SVG幅を計算する例題
+
+* https://discuss.4d.com/t/comment-determiner-la-taille-du-texte-dans-svg-new-textarea/22005/3
