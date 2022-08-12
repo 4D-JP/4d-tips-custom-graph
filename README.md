@@ -19,16 +19,16 @@ GRAPHコマンドをカスタマイズする例題
 $nbChar:=0
 
 If ($graphType#7)
-  $nbLoops:=$nbSeries
+	$nbLoops:=$nbSeries
 Else 
-  $nbLoops:=$nbValues
+	$nbLoops:=$nbValues
 End if 
 
 For ($serie;1;$nbLoops)
-  $n:=Length:C16($legendLabels{$serie})
-  If ($n>$nbChar)
-    $nbChar:=$n
-  End if 
+	$n:=Length:C16($legendLabels{$serie})
+	If ($n>$nbChar)
+		$nbChar:=$n
+	End if 
 End for 
 
 $LegendWidth:=(3*$LegendlInternalMarginH)+$LegendBulletWidth+(($nbChar+2)*$LabelsFontWidth)
