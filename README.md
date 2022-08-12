@@ -5,5 +5,5 @@ GRAPHコマンドをカスタマイズする例題
 
 ## 概要
 
-[GRAPH](https://doc.4d.com/4Dv19R5/4D/19-R5/GRAPH.301-5830605.ja.html)は内部的に[PROCESS 4D TAGS](https://doc.4d.com/4Dv19R5/4D/19-R5/PROCESS-4D-TAGS.301-5831242.ja.html)テンプレートを処理してSVGを出力しています。
+[GRAPH](https://doc.4d.com/4Dv19R5/4D/19-R5/GRAPH.301-5830605.ja.html)は内部的に[PROCESS 4D TAGS](https://doc.4d.com/4Dv19R5/4D/19-R5/PROCESS-4D-TAGS.301-5831242.ja.html)テンプレートを処理してSVGを出力しています。そのテンプレートはアプリケーション内のResources/GraphTemplatesフォルダーに置かれていますが，プロジェクトの`/RESOURCES/`フォルダーにGraphTemplatesフォルダーがあれば，そちらのほうが優先的に使用されます。
 
